@@ -81,5 +81,12 @@ private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHand
         );
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(ProductPersistenceException.class)
+    public ResponseEntity<String> handleProductPersistence(ProductPersistenceException ex) {
+        logger.error("Internal error while saving product: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Internal error while saving product: " + ex.getMessage());
+    }
 	
 }

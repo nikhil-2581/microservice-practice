@@ -13,4 +13,5 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 	List<Product> findByCategory(String category);
     List<Product> findByAvailable(Boolean available);
     List<Product> findByCategoryAndAvailable(String category, Boolean available);
+    boolean existsByProductName(String productName);
 }

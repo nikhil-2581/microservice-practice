@@ -32,14 +32,18 @@ public class ProductController {
     ProductService productService;
 
     @PostMapping
-    public ResponseEntity<ProductResponseDTO> createProduct(@Valid @RequestBody ProductRequestDTO requestDTO) {
-    	logger.info("Received request to create product: {}", requestDTO.getProductName());
+    public ResponseEntity<ProductResponseDTO> createProduct(@RequestBody @Valid ProductRequestDTO requestDTO) {
         ProductResponseDTO responseDTO = productService.createProduct(requestDTO);
+
+        if ("Unavailable".equalsIgnoreCase(responseDTO.getCategory())) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(responseDTO);
+        }
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
+
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponseDTO> getProductById(@PathVariable("id") String productId) {
+    public ResponseEntity<ProductResponseDTO> getProductById(@PathVariable("id") Long productId) {
     	logger.info("Received request to get product: {}", productId);
         ProductResponseDTO responseDTO = productService.getProductById(productId);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
@@ -53,7 +57,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable("id") String productId,
+    public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable("id") Long productId,
                                                             @Valid @RequestBody ProductRequestDTO requestDTO) {
     	logger.info("Received request to update product: {}", productId);
         ProductResponseDTO responseDTO = productService.updateProduct(productId, requestDTO);

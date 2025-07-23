@@ -14,7 +14,7 @@ public class Product {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_id", nullable = false, unique = true)
-    private String productId;
+    private Long productId;
     
     @Column(name = "product_name", nullable = false)
     @NotBlank(message = "Product name cannot be empty or null")
@@ -42,7 +42,7 @@ public class Product {
     // Constructors
     public Product() {}
     
-    public Product(String productId, String productName, BigDecimal price, String category, Boolean available) {
+    public Product(Long productId, String productName, BigDecimal price, String category, Boolean available) {
         this.productId = productId;
         this.productName = productName;
         this.price = price;
@@ -53,8 +53,8 @@ public class Product {
     }
     
     // Getters and Setters
-    public String getProductId() { return productId; }
-    public void setProductId(String productId) { this.productId = productId; }
+    public Long getProductId() { return productId; }
+    public void setProductId(Long productId) { this.productId = productId; }
     
     public String getProductName() { return productName; }
     public void setProductName(String productName) { this.productName = productName; }
