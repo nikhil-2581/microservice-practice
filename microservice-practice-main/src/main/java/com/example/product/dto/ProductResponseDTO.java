@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 public class ProductResponseDTO {
 
 
-    private Long productId;
+    private String productId;
     private String productName;
     private BigDecimal price;
     private String category;
@@ -14,11 +14,11 @@ public class ProductResponseDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Long getProductId() {
+    public String getProductId() {
         return productId;
     }
 
-    public void setProductId(Long productId) {
+    public void setProductId(String productId) {
         this.productId = productId;
     }
 
