@@ -29,6 +29,8 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     ProductRepository productRepository;
 
+    @Autowired
+    ProductRecoveryService recoveryService;
 
 
     @Retryable(
@@ -36,7 +38,6 @@ public class ProductServiceImpl implements ProductService {
             maxAttempts = 3,
             backoff = @Backoff(delay = 2000)
     )
-
     @Override
     public ProductResponseDTO createProduct(ProductRequestDTO requestDTO) {
     	logger.info("Creating product with ID: {}", requestDTO.getProductName());
@@ -51,80 +52,113 @@ public class ProductServiceImpl implements ProductService {
             throw new IllegalArgumentException("Product must be marked as available to be saved");
         }
 
-//Checking the retryable function!
-       logger.info("Trying to save product...");
+        //Checking the retryable function!
+       //logger.info("Trying to save product...");
        // Simulate DB failure
-        throw new TransientDataAccessException("Simulated failure") {};
+        //throw new TransientDataAccessException("Simulated failure") {};
         
         
-        //Product product = ProductMapper.mapRequestToEntity(requestDTO);
-        //product.setProductId(UUID.randomUUID().toString());  // generate unique ID
-        //Product savedProduct = productRepository.save(product);
-        //logger.info("Product created successfully with ID: {}", savedProduct.getProductId());
-        //return ProductMapper.mapEntityToResponse(savedProduct);
+        Product product = ProductMapper.mapRequestToEntity(requestDTO);
+        Product savedProduct = productRepository.save(product);
+        logger.info("Product created successfully with ID: {}", savedProduct.getProductId());
+        return ProductMapper.mapEntityToResponse(savedProduct);
     }
 
     @Recover
-    public ProductResponseDTO recover(TransientDataAccessException e, ProductRequestDTO requestDTO) {
-        logger.error("All retry attempts failed for saving product '{}'. Reason: {}", requestDTO.getProductName(), e.getMessage());
-
-        // You can return a fallback response or null to gracefully handle failure
-        ProductResponseDTO fallback = new ProductResponseDTO();
-        fallback.setProductName(requestDTO.getProductName());
-        fallback.setAvailable(false);
-        fallback.setPrice(BigDecimal.valueOf(0.0));
-        fallback.setCategory("Unavailable");
-        fallback.setCreatedAt(null);
-        fallback.setUpdatedAt(null);
-
-        logger.info("Returning fallback response for product '{}'", requestDTO.getProductName());
-
-        return fallback;
+    public ProductResponseDTO recoverCreateProduct(TransientDataAccessException e, ProductRequestDTO requestDTO) {
+        return recoveryService.recoverCreateProduct(e, requestDTO);
     }
 
-
+    @Retryable(
+            value = {TransientDataAccessException.class},
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 2000)
+    )
     @Override
     public ProductResponseDTO getProductById(Long productId) {
-    	logger.info("Retrieving product with ID: {}", productId);
-        Product product = productRepository.findById(String.valueOf((productId)))
-                .orElseThrow(() -> new ProductNotFoundException("Product not found with ID: " + productId));
-        return ProductMapper.mapEntityToResponse(product);
+        logger.info("Simulating failure for retry test in getProductById...");
+        throw new TransientDataAccessException("Simulated DB failure") {};
+//    	logger.info("Retrieving product with ID: {}", productId);
+//        Product product = productRepository.findById(productId)
+//                .orElseThrow(() -> new ProductNotFoundException("Product not found with ID: " + productId));
+//        return ProductMapper.mapEntityToResponse(product);
     }
 
+    @Recover
+    public ProductResponseDTO recoverGetProductById(TransientDataAccessException e, Long productId) {
+        return recoveryService.recoverGetProductById(e, productId);
+    }
+
+    @Retryable(
+            value = {TransientDataAccessException.class},
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 2000)
+    )
     @Override
     public List<ProductResponseDTO> getAllProducts() {
-    	logger.info("Retrieving all products");
-        List<Product> products = productRepository.findAll();
-        return products.stream()
-                .map(ProductMapper::mapEntityToResponse)
-                .collect(Collectors.toList());
+        logger.info("Simulating failure for retry test in getAllProducts...");
+        throw new TransientDataAccessException("Simulated DB error") {};
+//    	logger.info("Retrieving all products");
+//        List<Product> products = productRepository.findAll();
+//        return products.stream()
+//                .map(ProductMapper::mapEntityToResponse)
+//                .collect(Collectors.toList());
+   }
+
+    @Recover
+    public List<ProductResponseDTO> recoverGetAllProducts(TransientDataAccessException e) {
+        return recoveryService.recoverGetAllProducts(e);
     }
 
+    @Retryable(
+            value = {TransientDataAccessException.class},
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 2000)
+    )
     @Override
     public ProductResponseDTO updateProduct(Long productId, ProductRequestDTO requestDTO) {
-    	logger.info("Updating product with ID: {}", productId);
-        Product product = productRepository.findById(String.valueOf((productId)))
-                .orElseThrow(() -> new ProductNotFoundException("Product not found with ID: " + productId));
+        logger.info("Simulating failure for updateProduct retry test...");
+        throw new TransientDataAccessException("Simulated update error") {};
+ //   	logger.info("Updating product with ID: {}", productId);
+//        Product product = productRepository.findById(productId)
+//                .orElseThrow(() -> new ProductNotFoundException("Product not found with ID: " + productId));
+//
+//        product.setProductName(requestDTO.getProductName());
+//        product.setPrice(requestDTO.getPrice());
+//        product.setCategory(requestDTO.getCategory());
+//        product.setAvailable(requestDTO.getAvailable());
+//
+//        Product updatedProduct = productRepository.save(product);
+//        logger.info("Product updated successfully with ID: {}", updatedProduct.getProductId());
+//
+//        return ProductMapper.mapEntityToResponse(updatedProduct);
+  }
 
-        product.setProductName(requestDTO.getProductName());
-        product.setPrice(requestDTO.getPrice());
-        product.setCategory(requestDTO.getCategory());
-        product.setAvailable(requestDTO.getAvailable());
-
-        Product updatedProduct = productRepository.save(product);
-        logger.info("Product updated successfully with ID: {}", updatedProduct.getProductId());
-
-        return ProductMapper.mapEntityToResponse(updatedProduct);
+    @Recover
+    public ProductResponseDTO recoverUpdateProduct(TransientDataAccessException e, Long productId, ProductRequestDTO requestDTO) {
+        return recoveryService.recoverUpdateProduct(e, productId, requestDTO);
     }
 
+    @Retryable(
+            value = {TransientDataAccessException.class},
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 2000)
+    )
     @Override
-    public void deleteProduct(String productId) {
-    	logger.info("Deleting product with ID: {}", productId);
-    	
-        if (!productRepository.existsById((productId))) {
-            throw new ProductNotFoundException("Product not found with ID: " + productId);
-        }
-        productRepository.deleteById((productId));
-        logger.info("Product deleted successfully with ID: {}", productId);
+    public void deleteProduct(Long productId) {
+        logger.info("Simulating failure for deleteProduct retry test...");
+        throw new TransientDataAccessException("Simulated delete failure") {};
+//    	logger.info("Deleting product with ID: {}", productId);
+//
+//        if (!productRepository.existsById(productId)) {
+//            throw new ProductNotFoundException("Product not found with ID: " + productId);
+//        }
+//        productRepository.deleteById(productId);
+//        logger.info("Product deleted successfully with ID: {}", productId);
+    }
+
+    @Recover
+    public void recoverDeleteProduct(TransientDataAccessException e, Long productId) {
+        recoveryService.recoverDeleteProduct(e, productId);
     }
 }

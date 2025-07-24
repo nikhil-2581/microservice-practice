@@ -1,5 +1,6 @@
 package com.example.product.dto;
 
+import com.example.product.validation.ValidCategory;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,6 +17,7 @@ public class ProductRequestDTO {
     private BigDecimal price;
 
     @NotBlank(message = "Category cannot be empty")
+    @ValidCategory
     private String category;
 
     @NotNull(message = "Availability status cannot be null")
