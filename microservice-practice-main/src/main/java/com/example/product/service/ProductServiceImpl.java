@@ -76,12 +76,12 @@ public class ProductServiceImpl implements ProductService {
     )
     @Override
     public ProductResponseDTO getProductById(Long productId) {
-        logger.info("Simulating failure for retry test in getProductById...");
-        throw new TransientDataAccessException("Simulated DB failure") {};
-//    	logger.info("Retrieving product with ID: {}", productId);
-//        Product product = productRepository.findById(productId)
-//                .orElseThrow(() -> new ProductNotFoundException("Product not found with ID: " + productId));
-//        return ProductMapper.mapEntityToResponse(product);
+//        logger.info("Simulating failure for retry test in getProductById...");
+//        throw new TransientDataAccessException("Simulated DB failure") {};
+    	logger.info("Retrieving product with ID: {}", productId);
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with ID: " + productId));
+        return ProductMapper.mapEntityToResponse(product);
     }
 
     @Recover
@@ -96,13 +96,13 @@ public class ProductServiceImpl implements ProductService {
     )
     @Override
     public List<ProductResponseDTO> getAllProducts() {
-        logger.info("Simulating failure for retry test in getAllProducts...");
-        throw new TransientDataAccessException("Simulated DB error") {};
-//    	logger.info("Retrieving all products");
-//        List<Product> products = productRepository.findAll();
-//        return products.stream()
-//                .map(ProductMapper::mapEntityToResponse)
-//                .collect(Collectors.toList());
+//        logger.info("Simulating failure for retry test in getAllProducts...");
+//        throw new TransientDataAccessException("Simulated DB error") {};
+    	logger.info("Retrieving all products");
+        List<Product> products = productRepository.findAll();
+        return products.stream()
+                .map(ProductMapper::mapEntityToResponse)
+                .collect(Collectors.toList());
    }
 
     @Recover
@@ -117,21 +117,21 @@ public class ProductServiceImpl implements ProductService {
     )
     @Override
     public ProductResponseDTO updateProduct(Long productId, ProductRequestDTO requestDTO) {
-        logger.info("Simulating failure for updateProduct retry test...");
-        throw new TransientDataAccessException("Simulated update error") {};
- //   	logger.info("Updating product with ID: {}", productId);
-//        Product product = productRepository.findById(productId)
-//                .orElseThrow(() -> new ProductNotFoundException("Product not found with ID: " + productId));
-//
-//        product.setProductName(requestDTO.getProductName());
-//        product.setPrice(requestDTO.getPrice());
-//        product.setCategory(requestDTO.getCategory());
-//        product.setAvailable(requestDTO.getAvailable());
-//
-//        Product updatedProduct = productRepository.save(product);
-//        logger.info("Product updated successfully with ID: {}", updatedProduct.getProductId());
-//
-//        return ProductMapper.mapEntityToResponse(updatedProduct);
+//        logger.info("Simulating failure for updateProduct retry test...");
+//        throw new TransientDataAccessException("Simulated update error") {};
+    	logger.info("Updating product with ID: {}", productId);
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with ID: " + productId));
+
+        product.setProductName(requestDTO.getProductName());
+        product.setPrice(requestDTO.getPrice());
+        product.setCategory(requestDTO.getCategory());
+        product.setAvailable(requestDTO.getAvailable());
+
+        Product updatedProduct = productRepository.save(product);
+        logger.info("Product updated successfully with ID: {}", updatedProduct.getProductId());
+
+        return ProductMapper.mapEntityToResponse(updatedProduct);
   }
 
     @Recover
@@ -146,15 +146,15 @@ public class ProductServiceImpl implements ProductService {
     )
     @Override
     public void deleteProduct(Long productId) {
-        logger.info("Simulating failure for deleteProduct retry test...");
-        throw new TransientDataAccessException("Simulated delete failure") {};
-//    	logger.info("Deleting product with ID: {}", productId);
-//
-//        if (!productRepository.existsById(productId)) {
-//            throw new ProductNotFoundException("Product not found with ID: " + productId);
-//        }
-//        productRepository.deleteById(productId);
-//        logger.info("Product deleted successfully with ID: {}", productId);
+//        logger.info("Simulating failure for deleteProduct retry test...");
+//        throw new TransientDataAccessException("Simulated delete failure") {};
+    	logger.info("Deleting product with ID: {}", productId);
+
+        if (!productRepository.existsById(productId)) {
+            throw new ProductNotFoundException("Product not found with ID: " + productId);
+        }
+        productRepository.deleteById(productId);
+        logger.info("Product deleted successfully with ID: {}", productId);
     }
 
     @Recover
