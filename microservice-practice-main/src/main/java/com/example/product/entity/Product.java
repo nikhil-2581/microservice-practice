@@ -3,6 +3,7 @@ package com.example.product.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.example.product.validation.ValidCategory;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -27,6 +28,7 @@ public class Product {
     
     @Column(name = "category", nullable = false)
     @NotBlank(message = "Category cannot be empty")
+    @ValidCategory
     private String category;
     
     @Column(name = "available", nullable = false)
